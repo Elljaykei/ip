@@ -65,6 +65,9 @@ public class Orbit {
         case CommandType.EVENT:
             addEvent(input);
             break;
+        case CommandType.DELETE:
+            deleteTask(input);
+            break;
         default:
             throw new OrbitException("I'm sorry, but I don't know what that means :-(");
         }
@@ -147,6 +150,13 @@ public class Orbit {
     private void addTask(Task task) {
         tasks.add(task);
         showMessage("Got it. I've added this task:\n   " + task
+                + "\n Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    private void deleteTask(String input) throws OrbitException {
+        int index = parseTaskIndex(input, "delete");
+        Task removed = tasks.remove(index);
+        showMessage("Noted. I've removed this task:\n   " + removed
                 + "\n Now you have " + tasks.size() + " tasks in the list.");
     }
 

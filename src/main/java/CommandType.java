@@ -25,6 +25,7 @@ public final class CommandType {
         case "todo" -> TODO;
         case "deadline" -> DEADLINE;
         case "event" -> EVENT;
+        case "delete" -> DELETE;
         default -> UNKNOWN;
         };
     }
