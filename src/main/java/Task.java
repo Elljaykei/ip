@@ -1,11 +1,11 @@
 /**
  * Represents a task and whether it has been completed.
  */
-public class Task {
+public abstract class Task {
     private final String description;
     private boolean isDone;
 
-    public Task(String description) {
+    protected Task(String description) {
         this.description = description;
     }
 
@@ -17,8 +17,10 @@ public class Task {
         isDone = false;
     }
 
+    protected abstract String getTypeSymbol();
+
     @Override
     public String toString() {
-        return "[" + (isDone ? "X" : " ") + "] " + description;
+        return "[" + getTypeSymbol() + "][" + (isDone ? "X" : " ") + "] " + description;
     }
 }

@@ -45,9 +45,21 @@ public class Orbit {
                 Task task = tasks.get(Integer.parseInt(input.substring(7)) - 1);
                 task.markAsNotDone();
                 System.out.println(" OK, I've marked this task as not done yet:\n   " + task);
-            } else {
-                tasks.add(new Task(input));
-                System.out.println(" added: " + input);
+            } else if (input.startsWith("todo ")) {
+                Task task = new Todo(input.substring(5));
+                tasks.add(task);
+                System.out.println(" Got it. I've added this task:\n   " + task);
+            } else if (input.startsWith("deadline ")) {
+                String[] parts = input.substring(9).split(" /by ", 2);
+                Task task = new Deadline(parts[0], parts[1]);
+                tasks.add(task);
+                System.out.println(" Got it. I've added this task:\n   " + task);
+            } else if (input.startsWith("event ")) {
+                String[] fromParts = input.substring(6).split(" /from ", 2);
+                String[] toParts = fromParts[1].split(" /to ", 2);
+                Task task = new Event(fromParts[0], toParts[0], toParts[1]);
+                tasks.add(task);
+                System.out.println(" Got it. I've added this task:\n   " + task);
             }
             System.out.println(LINE);
         }
