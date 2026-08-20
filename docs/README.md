@@ -1,6 +1,6 @@
-# Duke User Guide
+# Orbit User Guide
 
-// Update the title above to match the actual product name
+Orbit is a command-line personal assistant for tracking tasks.
 
 // Product screenshot goes here
 
