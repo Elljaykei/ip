@@ -5,6 +5,11 @@ public abstract class Task {
     private final String description;
     private boolean isDone;
 
+    /**
+     * Creates an incomplete task.
+     *
+     * @param description Human-readable task description.
+     */
     protected Task(String description) {
         this.description = description;
     }
@@ -17,10 +22,18 @@ public abstract class Task {
         isDone = false;
     }
 
-    protected abstract String getTypeSymbol();
+    protected String getStatusIcon() {
+        return isDone ? "X" : " ";
+    }
+
+    protected String getDescription() {
+        return description;
+    }
+
+    protected abstract TaskType getType();
 
     @Override
     public String toString() {
-        return "[" + getTypeSymbol() + "][" + (isDone ? "X" : " ") + "] " + description;
+        return "[" + getType().getSymbol() + "][" + getStatusIcon() + "] " + description;
     }
 }

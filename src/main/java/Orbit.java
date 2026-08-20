@@ -33,7 +33,7 @@ public class Orbit {
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine().trim();
             try {
-                int command = CommandType.from(input);
+                CommandType command = CommandType.from(input);
                 if (command == CommandType.BYE) {
                     showGoodbye();
                     return;
@@ -45,27 +45,27 @@ public class Orbit {
         }
     }
 
-    private void execute(int command, String input) throws OrbitException {
+    private void execute(CommandType command, String input) throws OrbitException {
         switch (command) {
-        case CommandType.LIST:
+        case LIST:
             showList();
             break;
-        case CommandType.MARK:
+        case MARK:
             updateStatus(input, true);
             break;
-        case CommandType.UNMARK:
+        case UNMARK:
             updateStatus(input, false);
             break;
-        case CommandType.TODO:
+        case TODO:
             addTodo(input);
             break;
-        case CommandType.DEADLINE:
+        case DEADLINE:
             addDeadline(input);
             break;
-        case CommandType.EVENT:
+        case EVENT:
             addEvent(input);
             break;
-        case CommandType.DELETE:
+        case DELETE:
             deleteTask(input);
             break;
         default:

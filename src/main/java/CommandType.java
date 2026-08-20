@@ -1,32 +1,22 @@
 /**
- * Integer command identifiers used by the parser.
+ * Commands understood by Orbit.
  */
-public final class CommandType {
-    public static final int BYE = 0;
-    public static final int LIST = 1;
-    public static final int MARK = 2;
-    public static final int UNMARK = 3;
-    public static final int TODO = 4;
-    public static final int DEADLINE = 5;
-    public static final int EVENT = 6;
-    public static final int DELETE = 7;
-    public static final int UNKNOWN = 8;
+public enum CommandType {
+    BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, UNKNOWN;
 
-    private CommandType() {
-    }
-
-    public static int from(String input) {
-        String command = input.split("\\s+", 2)[0].toLowerCase();
-        return switch (command) {
-        case "bye" -> BYE;
-        case "list" -> LIST;
-        case "mark" -> MARK;
-        case "unmark" -> UNMARK;
-        case "todo" -> TODO;
-        case "deadline" -> DEADLINE;
-        case "event" -> EVENT;
-        case "delete" -> DELETE;
-        default -> UNKNOWN;
-        };
+    /**
+     * Identifies the command word at the start of a user input.
+     *
+     * @param input Complete user input.
+     * @return Matching command type, or {@link #UNKNOWN}.
+     */
+    public static CommandType from(String input) {
+        String commandWord = input.split("\\s+", 2)[0];
+        for (CommandType command : values()) {
+            if (command.name().equalsIgnoreCase(commandWord)) {
+                return command;
+            }
+        }
+        return UNKNOWN;
     }
 }

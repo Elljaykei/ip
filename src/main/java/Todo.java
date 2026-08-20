@@ -7,7 +7,7 @@ public class Todo extends Task {
     }
 
     @Override
-    protected String getTypeSymbol() {
-        return "T";
+    protected TaskType getType() {
+        return TaskType.TODO;
     }
 }

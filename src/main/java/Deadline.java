@@ -10,8 +10,8 @@ public class Deadline extends Task {
     }
 
     @Override
-    protected String getTypeSymbol() {
-        return "D";
+    protected TaskType getType() {
+        return TaskType.DEADLINE;
     }
 
     @Override
