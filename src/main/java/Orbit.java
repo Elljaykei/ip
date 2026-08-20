@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Orbit is a command-line chatbot that helps the user track tasks.
+ * Orbit is a command-line chatbot that keeps track of a user's tasks.
  */
 public class Orbit {
     private static final String LINE = "____________________________________________________________";
@@ -13,55 +13,177 @@ public class Orbit {
             + "| |_| |  _ <| |_) | |  | |\n"
             + " \\___/|_| \\_\\____/___| |_|";
 
+    private final List<Task> tasks = new ArrayList<>();
+    private final Scanner scanner;
+
     /**
-     * Echoes commands until the user enters {@code bye}.
+     * Creates an Orbit chatbot that reads commands from the supplied scanner.
      *
-     * @param args Command-line arguments; not used.
+     * @param scanner Source of user commands.
      */
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        List<Task> tasks = new ArrayList<>();
+    public Orbit(Scanner scanner) {
+        this.scanner = scanner;
+    }
+
+    /**
+     * Starts the chatbot and processes commands until the user enters {@code bye}.
+     */
+    public void run() {
+        showWelcome();
+        while (scanner.hasNextLine()) {
+            String input = scanner.nextLine().trim();
+            try {
+                int command = CommandType.from(input);
+                if (command == CommandType.BYE) {
+                    showGoodbye();
+                    return;
+                }
+                execute(command, input);
+            } catch (OrbitException e) {
+                showMessage("OOPS!!! " + e.getMessage());
+            }
+        }
+    }
+
+    private void execute(int command, String input) throws OrbitException {
+        switch (command) {
+        case CommandType.LIST:
+            showList();
+            break;
+        case CommandType.MARK:
+            updateStatus(input, true);
+            break;
+        case CommandType.UNMARK:
+            updateStatus(input, false);
+            break;
+        case CommandType.TODO:
+            addTodo(input);
+            break;
+        case CommandType.DEADLINE:
+            addDeadline(input);
+            break;
+        case CommandType.EVENT:
+            addEvent(input);
+            break;
+        default:
+            throw new OrbitException("I'm sorry, but I don't know what that means :-(");
+        }
+    }
+
+    private void showWelcome() {
         System.out.println(LINE);
         System.out.println(BANNER);
         System.out.println(" Hello! I'm Orbit");
         System.out.println(" What can I do for you?");
         System.out.println(LINE);
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine();
-            if (input.equals("bye")) {
-                System.out.println(" Bye. Hope to see you again soon!");
-                System.out.println(LINE);
-                break;
-            }
-            if (input.equals("list")) {
-                for (int i = 0; i < tasks.size(); i++) {
-                    System.out.println(" " + (i + 1) + "." + tasks.get(i));
-                }
-            } else if (input.startsWith("mark ")) {
-                Task task = tasks.get(Integer.parseInt(input.substring(5)) - 1);
-                task.markAsDone();
-                System.out.println(" Nice! I've marked this task as done:\n   " + task);
-            } else if (input.startsWith("unmark ")) {
-                Task task = tasks.get(Integer.parseInt(input.substring(7)) - 1);
-                task.markAsNotDone();
-                System.out.println(" OK, I've marked this task as not done yet:\n   " + task);
-            } else if (input.startsWith("todo ")) {
-                Task task = new Todo(input.substring(5));
-                tasks.add(task);
-                System.out.println(" Got it. I've added this task:\n   " + task);
-            } else if (input.startsWith("deadline ")) {
-                String[] parts = input.substring(9).split(" /by ", 2);
-                Task task = new Deadline(parts[0], parts[1]);
-                tasks.add(task);
-                System.out.println(" Got it. I've added this task:\n   " + task);
-            } else if (input.startsWith("event ")) {
-                String[] fromParts = input.substring(6).split(" /from ", 2);
-                String[] toParts = fromParts[1].split(" /to ", 2);
-                Task task = new Event(fromParts[0], toParts[0], toParts[1]);
-                tasks.add(task);
-                System.out.println(" Got it. I've added this task:\n   " + task);
-            }
-            System.out.println(LINE);
+    }
+
+    private void showGoodbye() {
+        showMessage("Bye. Hope to see you again soon!");
+    }
+
+    private void showMessage(String message) {
+        System.out.println(LINE);
+        System.out.println(" " + message);
+        System.out.println(LINE);
+    }
+
+    private void showList() {
+        System.out.println(LINE);
+        System.out.println(" Here are the tasks in your list:");
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.get(i));
         }
+        System.out.println(LINE);
+    }
+
+    private void updateStatus(String input, boolean isDone) throws OrbitException {
+        String command = isDone ? "mark" : "unmark";
+        int index = parseTaskIndex(input, command);
+        Task task = tasks.get(index);
+        if (isDone) {
+            task.markAsDone();
+            showMessage("Nice! I've marked this task as done:\n   " + task);
+        } else {
+            task.markAsNotDone();
+            showMessage("OK, I've marked this task as not done yet:\n   " + task);
+        }
+    }
+
+    private void addTodo(String input) throws OrbitException {
+        String description = extractDescription(input, "todo");
+        addTask(new Todo(description));
+    }
+
+    private void addDeadline(String input) throws OrbitException {
+        String details = extractDescription(input, "deadline");
+        int separator = details.indexOf(" /by ");
+        if (separator < 0) {
+            throw new OrbitException("A deadline needs a description and '/by' date or time.");
+        }
+        String description = details.substring(0, separator).trim();
+        String by = details.substring(separator + 5).trim();
+        requireNonEmpty(description, "The description of a deadline cannot be empty.");
+        requireNonEmpty(by, "The '/by' date or time of a deadline cannot be empty.");
+        addTask(new Deadline(description, by));
+    }
+
+    private void addEvent(String input) throws OrbitException {
+        String details = extractDescription(input, "event");
+        int fromSeparator = details.indexOf(" /from ");
+        int toSeparator = details.indexOf(" /to ");
+        if (fromSeparator < 0 || toSeparator < 0 || toSeparator < fromSeparator) {
+            throw new OrbitException("An event needs a description, '/from' time, and '/to' time.");
+        }
+        String description = details.substring(0, fromSeparator).trim();
+        String from = details.substring(fromSeparator + 7, toSeparator).trim();
+        String to = details.substring(toSeparator + 5).trim();
+        requireNonEmpty(description, "The description of an event cannot be empty.");
+        requireNonEmpty(from, "The '/from' time of an event cannot be empty.");
+        requireNonEmpty(to, "The '/to' time of an event cannot be empty.");
+        addTask(new Event(description, from, to));
+    }
+
+    private void addTask(Task task) {
+        tasks.add(task);
+        showMessage("Got it. I've added this task:\n   " + task
+                + "\n Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    private int parseTaskIndex(String input, String command) throws OrbitException {
+        String argument = input.substring(command.length()).trim();
+        if (argument.isEmpty()) {
+            throw new OrbitException("Please specify a task number to " + command + ".");
+        }
+        try {
+            int index = Integer.parseInt(argument) - 1;
+            if (index < 0 || index >= tasks.size()) {
+                throw new OrbitException("That task number does not exist.");
+            }
+            return index;
+        } catch (NumberFormatException e) {
+            throw new OrbitException("The task number must be a whole number.");
+        }
+    }
+
+    private String extractDescription(String input, String command) throws OrbitException {
+        String description = input.substring(command.length()).trim();
+        requireNonEmpty(description, "The description of a " + command + " cannot be empty.");
+        return description;
+    }
+
+    private void requireNonEmpty(String text, String errorMessage) throws OrbitException {
+        if (text.isEmpty()) {
+            throw new OrbitException(errorMessage);
+        }
+    }
+
+    /**
+     * Runs Orbit using standard input.
+     *
+     * @param args Command-line arguments; not used.
+     */
+    public static void main(String[] args) {
+        new Orbit(new Scanner(System.in)).run();
     }
 }
