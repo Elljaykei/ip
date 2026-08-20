@@ -20,7 +20,7 @@ public class Orbit {
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        List<String> tasks = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
         System.out.println(LINE);
         System.out.println(BANNER);
         System.out.println(" Hello! I'm Orbit");
@@ -35,10 +35,18 @@ public class Orbit {
             }
             if (input.equals("list")) {
                 for (int i = 0; i < tasks.size(); i++) {
-                    System.out.println(" " + (i + 1) + ". " + tasks.get(i));
+                    System.out.println(" " + (i + 1) + "." + tasks.get(i));
                 }
+            } else if (input.startsWith("mark ")) {
+                Task task = tasks.get(Integer.parseInt(input.substring(5)) - 1);
+                task.markAsDone();
+                System.out.println(" Nice! I've marked this task as done:\n   " + task);
+            } else if (input.startsWith("unmark ")) {
+                Task task = tasks.get(Integer.parseInt(input.substring(7)) - 1);
+                task.markAsNotDone();
+                System.out.println(" OK, I've marked this task as not done yet:\n   " + task);
             } else {
-                tasks.add(input);
+                tasks.add(new Task(input));
                 System.out.println(" added: " + input);
             }
             System.out.println(LINE);
