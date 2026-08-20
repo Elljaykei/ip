@@ -12,7 +12,7 @@ public class Orbit {
             + " \\___/|_| \\_\\____/___| |_|";
 
     /**
-     * Greets the user and exits.
+     * Echoes commands until the user enters {@code bye}.
      *
      * @param args Command-line arguments; not used.
      */
@@ -23,7 +23,15 @@ public class Orbit {
         System.out.println(" Hello! I'm Orbit");
         System.out.println(" What can I do for you?");
         System.out.println(LINE);
-        System.out.println(" Bye. Hope to see you again soon!");
-        System.out.println(LINE);
+        while (scanner.hasNextLine()) {
+            String input = scanner.nextLine();
+            if (input.equals("bye")) {
+                System.out.println(" Bye. Hope to see you again soon!");
+                System.out.println(LINE);
+                break;
+            }
+            System.out.println(" " + input);
+            System.out.println(LINE);
+        }
     }
 }
