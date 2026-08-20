@@ -1,30 +1,17 @@
 # Orbit User Guide
 
-Orbit is a command-line personal assistant for tracking tasks.
+Orbit is a command-line chatbot for tracking todos, deadlines, and events.
 
-// Product screenshot goes here
+## Commands
 
-// Product intro goes here
+* `todo DESCRIPTION` — adds a task without a date or time.
+* `deadline DESCRIPTION /by DATE_OR_TIME` — adds a task with a deadline.
+* `event DESCRIPTION /from START /to END` — adds an event.
+* `list` — displays all tasks.
+* `mark NUMBER` — marks a task as done.
+* `unmark NUMBER` — marks a task as not done.
+* `delete NUMBER` — removes a task.
+* `bye` — exits Orbit.
 
-## Adding deadlines
-
-// Describe the action and its outcome.
-
-// Give examples of usage
-
-Example: `keyword (optional arguments)`
-
-// A description of the expected outcome goes here
-
-```
-expected output
-```
-
-## Feature ABC
-
-// Feature details
-
-
-## Feature XYZ
-
-// Feature details
+For example, `deadline submit report /by Friday 5pm` adds a deadline named
+`submit report` whose date and time is displayed as `Friday 5pm`.
