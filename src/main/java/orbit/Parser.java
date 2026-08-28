@@ -1,3 +1,5 @@
+package orbit;
+
 /**
  * Interprets user input as an Orbit command.
  */

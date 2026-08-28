@@ -1,3 +1,5 @@
+package orbit;
+
 import java.util.Scanner;
 
 /**
