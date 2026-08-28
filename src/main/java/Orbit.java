@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 
 /**
  * Orbit is a command-line chatbot that keeps track of a user's tasks.
@@ -140,7 +141,11 @@ public class Orbit {
         String by = details.substring(separator + 5).trim();
         requireNonEmpty(description, "The description of a deadline cannot be empty.");
         requireNonEmpty(by, "The '/by' date or time of a deadline cannot be empty.");
-        addTask(new Deadline(description, by));
+        try {
+            addTask(new Deadline(description, by));
+        } catch (DateTimeParseException e) {
+            throw new OrbitException("Use yyyy-mm-dd for deadline dates, for example 2026-08-28.");
+        }
     }
 
     private void addEvent(String input) throws OrbitException {
