@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.io.IOException;
 
 /**
  * Orbit is a command-line chatbot that keeps track of a user's tasks.
@@ -13,8 +14,9 @@ public class Orbit {
             + "| |_| |  _ <| |_) | |  | |\n"
             + " \\___/|_| \\_\\____/___| |_|";
 
-    private final List<Task> tasks = new ArrayList<>();
+    private final List<Task> tasks;
     private final Scanner scanner;
+    private final Storage storage;
 
     /**
      * Creates an Orbit chatbot that reads commands from the supplied scanner.
@@ -23,6 +25,15 @@ public class Orbit {
      */
     public Orbit(Scanner scanner) {
         this.scanner = scanner;
+        this.storage = new Storage("data/orbit.txt");
+        List<Task> loadedTasks;
+        try {
+            loadedTasks = storage.load();
+        } catch (IOException | OrbitException e) {
+            loadedTasks = new ArrayList<>();
+            System.out.println("OOPS!!! Could not load saved tasks: " + e.getMessage());
+        }
+        this.tasks = loadedTasks;
     }
 
     /**
@@ -111,6 +122,7 @@ public class Orbit {
             task.markAsNotDone();
             showMessage("OK, I've marked this task as not done yet:\n   " + task);
         }
+        saveTasks();
     }
 
     private void addTodo(String input) throws OrbitException {
@@ -149,6 +161,7 @@ public class Orbit {
 
     private void addTask(Task task) {
         tasks.add(task);
+        saveTasks();
         showMessage("Got it. I've added this task:\n   " + task
                 + "\n Now you have " + tasks.size() + " tasks in the list.");
     }
@@ -156,8 +169,17 @@ public class Orbit {
     private void deleteTask(String input) throws OrbitException {
         int index = parseTaskIndex(input, "delete");
         Task removed = tasks.remove(index);
+        saveTasks();
         showMessage("Noted. I've removed this task:\n   " + removed
                 + "\n Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    private void saveTasks() {
+        try {
+            storage.save(tasks);
+        } catch (IOException e) {
+            showMessage("OOPS!!! Could not save tasks: " + e.getMessage());
+        }
     }
 
     private int parseTaskIndex(String input, String command) throws OrbitException {

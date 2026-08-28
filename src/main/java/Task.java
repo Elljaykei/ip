@@ -22,6 +22,14 @@ public abstract class Task {
         isDone = false;
     }
 
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public String toDataString() {
+        return getType().getSymbol() + " | " + (isDone ? "1" : "0") + " | " + description;
+    }
+
     protected String getStatusIcon() {
         return isDone ? "X" : " ";
     }
