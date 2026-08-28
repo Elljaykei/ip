@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.io.IOException;
@@ -8,16 +7,10 @@ import java.time.format.DateTimeParseException;
  * Orbit is a command-line chatbot that keeps track of a user's tasks.
  */
 public class Orbit {
-    private static final String LINE = "____________________________________________________________";
-    private static final String BANNER = "  ___  ____  ____ ___ _____\n"
-            + " / _ \\|  _ \\| __ )_ _|_   _|\n"
-            + "| | | | |_) |  _ \\| |  | |\n"
-            + "| |_| |  _ <| |_) | |  | |\n"
-            + " \\___/|_| \\_\\____/___| |_|";
-
-    private final List<Task> tasks;
-    private final Scanner scanner;
+    private final TaskList tasks;
     private final Storage storage;
+    private final Ui ui;
+    private final Parser parser;
 
     /**
      * Creates an Orbit chatbot that reads commands from the supplied scanner.
@@ -25,16 +18,17 @@ public class Orbit {
      * @param scanner Source of user commands.
      */
     public Orbit(Scanner scanner) {
-        this.scanner = scanner;
+        this.ui = new Ui(scanner);
+        this.parser = new Parser();
         this.storage = new Storage("data/orbit.txt");
         List<Task> loadedTasks;
         try {
             loadedTasks = storage.load();
         } catch (IOException | OrbitException e) {
-            loadedTasks = new ArrayList<>();
+            loadedTasks = List.of();
             System.out.println("OOPS!!! Could not load saved tasks: " + e.getMessage());
         }
-        this.tasks = loadedTasks;
+        this.tasks = new TaskList(loadedTasks);
     }
 
     /**
@@ -42,10 +36,10 @@ public class Orbit {
      */
     public void run() {
         showWelcome();
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine().trim();
+        while (ui.hasNextCommand()) {
+            String input = ui.readCommand();
             try {
-                CommandType command = CommandType.from(input);
+                CommandType command = parser.parse(input);
                 if (command == CommandType.BYE) {
                     showGoodbye();
                     return;
@@ -86,11 +80,7 @@ public class Orbit {
     }
 
     private void showWelcome() {
-        System.out.println(LINE);
-        System.out.println(BANNER);
-        System.out.println(" Hello! I'm Orbit");
-        System.out.println(" What can I do for you?");
-        System.out.println(LINE);
+        ui.showWelcome();
     }
 
     private void showGoodbye() {
@@ -98,18 +88,15 @@ public class Orbit {
     }
 
     private void showMessage(String message) {
-        System.out.println(LINE);
-        System.out.println(" " + message);
-        System.out.println(LINE);
+        ui.showMessage(message);
     }
 
     private void showList() {
-        System.out.println(LINE);
-        System.out.println(" Here are the tasks in your list:");
+        StringBuilder message = new StringBuilder("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
+            message.append("\n ").append(i + 1).append('.').append(tasks.get(i));
         }
-        System.out.println(LINE);
+        ui.showMessage(message.toString());
     }
 
     private void updateStatus(String input, boolean isDone) throws OrbitException {
@@ -181,7 +168,7 @@ public class Orbit {
 
     private void saveTasks() {
         try {
-            storage.save(tasks);
+            storage.save(tasks.asList());
         } catch (IOException e) {
             showMessage("OOPS!!! Could not save tasks: " + e.getMessage());
         }
