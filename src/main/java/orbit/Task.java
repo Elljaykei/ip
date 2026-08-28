@@ -16,18 +16,30 @@ public abstract class Task {
         this.description = description;
     }
 
+    /** Marks this task as completed. */
     public void markAsDone() {
         isDone = true;
     }
 
+    /** Marks this task as incomplete. */
     public void markAsNotDone() {
         isDone = false;
     }
 
+    /**
+     * Returns whether this task has been completed.
+     *
+     * @return {@code true} if completed.
+     */
     public boolean isDone() {
         return isDone;
     }
 
+    /**
+     * Converts this task to its persistent text representation.
+     *
+     * @return Serialized task fields.
+     */
     public String toDataString() {
         return getType().getSymbol() + " | " + (isDone ? "1" : "0") + " | " + description;
     }

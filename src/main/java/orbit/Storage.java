@@ -12,10 +12,22 @@ import java.util.List;
 public class Storage {
     private final Path filePath;
 
+    /**
+     * Creates storage backed by the given relative file path.
+     *
+     * @param filePath Path of the task data file.
+     */
     public Storage(String filePath) {
         this.filePath = Path.of(filePath);
     }
 
+    /**
+     * Loads all tasks from disk, returning an empty list if the file is absent.
+     *
+     * @return Loaded tasks.
+     * @throws IOException If the data file cannot be read.
+     * @throws OrbitException If saved task data is invalid.
+     */
     public List<Task> load() throws IOException, OrbitException {
         if (Files.notExists(filePath)) {
             return new ArrayList<>();
@@ -27,6 +39,12 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Replaces the data file with the current task list.
+     *
+     * @param tasks Tasks to persist.
+     * @throws IOException If the tasks cannot be written.
+     */
     public void save(List<Task> tasks) throws IOException {
         Path parent = filePath.getParent();
         if (parent != null) {

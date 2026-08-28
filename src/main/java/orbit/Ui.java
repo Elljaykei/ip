@@ -14,18 +14,22 @@ public class Ui {
             + " \\___/|_| \\_\\____/___| |_|";
     private final Scanner scanner;
 
+    /** @param scanner Source of user commands. */
     public Ui(Scanner scanner) {
         this.scanner = scanner;
     }
 
+    /** @return Whether another command is available. */
     public boolean hasNextCommand() {
         return scanner.hasNextLine();
     }
 
+    /** @return Next trimmed user command. */
     public String readCommand() {
         return scanner.nextLine().trim();
     }
 
+    /** Displays Orbit's greeting. */
     public void showWelcome() {
         System.out.println(LINE);
         System.out.println(BANNER);
@@ -34,6 +38,7 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /** @param message Message to display between divider lines. */
     public void showMessage(String message) {
         System.out.println(LINE);
         System.out.println(" " + message);
