@@ -1,12 +1,16 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 /**
  * A task that must be completed by a specified date or time.
  */
 public class Deadline extends Task {
-    private final String by;
+    private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy");
+    private final LocalDate by;
 
     public Deadline(String description, String by) {
         super(description);
-        this.by = by;
+        this.by = LocalDate.parse(by);
     }
 
     @Override
@@ -21,6 +25,6 @@ public class Deadline extends Task {
 
     @Override
     public String toString() {
-        return super.toString() + " (by: " + by + ")";
+        return super.toString() + " (by: " + by.format(DISPLAY_FORMAT) + ")";
     }
 }
