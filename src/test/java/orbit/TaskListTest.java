@@ -3,6 +3,8 @@ package orbit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 public class TaskListTest {
@@ -27,5 +29,15 @@ public class TaskListTest {
 
         assertEquals(todo, removed);
         assertTrue(tasks.asList().isEmpty());
+    }
+
+    @Test
+    public void find_keyword_returnsCaseInsensitiveMatchesOnly() {
+        TaskList tasks = new TaskList();
+        Todo matchingTask = new Todo("Read Book");
+        tasks.add(matchingTask);
+        tasks.add(new Todo("buy groceries"));
+
+        assertEquals(List.of(matchingTask), tasks.find("book"));
     }
 }

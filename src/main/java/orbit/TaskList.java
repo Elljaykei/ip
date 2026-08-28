@@ -36,4 +36,11 @@ public class TaskList {
     public List<Task> asList() {
         return List.copyOf(tasks);
     }
+
+    public List<Task> find(String keyword) {
+        String normalizedKeyword = keyword.toLowerCase();
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase().contains(normalizedKeyword))
+                .toList();
+    }
 }

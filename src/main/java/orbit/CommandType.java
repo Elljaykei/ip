@@ -4,7 +4,7 @@ package orbit;
  * Commands understood by Orbit.
  */
 public enum CommandType {
-    BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, UNKNOWN;
+    BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND, UNKNOWN;
 
     /**
      * Identifies the command word at the start of a user input.

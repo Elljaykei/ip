@@ -76,6 +76,9 @@ public class Orbit {
         case DELETE:
             deleteTask(input);
             break;
+        case FIND:
+            findTasks(input);
+            break;
         default:
             throw new OrbitException("I'm sorry, but I don't know what that means :-(");
         }
@@ -166,6 +169,16 @@ public class Orbit {
         saveTasks();
         showMessage("Noted. I've removed this task:\n   " + removed
                 + "\n Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    private void findTasks(String input) throws OrbitException {
+        String keyword = extractDescription(input, "find");
+        List<Task> matches = tasks.find(keyword);
+        StringBuilder message = new StringBuilder("Here are the matching tasks in your list:");
+        for (int i = 0; i < matches.size(); i++) {
+            message.append("\n ").append(i + 1).append('.').append(matches.get(i));
+        }
+        showMessage(message.toString());
     }
 
     private void saveTasks() {
