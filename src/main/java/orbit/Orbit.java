@@ -1,14 +1,16 @@
 package orbit;
 
-import java.util.List;
-import java.util.Scanner;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  * Orbit is a command-line chatbot that keeps track of a user's tasks.
  */
 public class Orbit {
+    private static final String DATA_FILE_PATH = "data/orbit.txt";
+
     private final TaskList tasks;
     private final Storage storage;
     private final Ui ui;
@@ -22,7 +24,7 @@ public class Orbit {
     public Orbit(Scanner scanner) {
         this.ui = new Ui(scanner);
         this.parser = new Parser();
-        this.storage = new Storage("data/orbit.txt");
+        this.storage = new Storage(DATA_FILE_PATH);
         List<Task> loadedTasks;
         try {
             loadedTasks = storage.load();
