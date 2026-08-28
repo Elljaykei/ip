@@ -1,3 +1,5 @@
+package orbit;
+
 /**
  * Types of tasks supported by Orbit and their display symbols.
  */
