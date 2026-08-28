@@ -10,6 +10,12 @@ public class Deadline extends Task {
     private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy");
     private final LocalDate by;
 
+    /**
+     * Creates a deadline with an ISO-formatted date.
+     *
+     * @param description Task description.
+     * @param by Deadline date in {@code yyyy-mm-dd} format.
+     */
     public Deadline(String description, String by) {
         super(description);
         this.by = LocalDate.parse(by);
