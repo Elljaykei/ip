@@ -57,4 +57,17 @@ public class TaskList {
     public List<Task> asList() {
         return List.copyOf(tasks);
     }
+
+    /**
+     * Finds tasks whose descriptions contain a keyword, ignoring case.
+     *
+     * @param keyword Search keyword.
+     * @return Matching tasks in their original order.
+     */
+    public List<Task> find(String keyword) {
+        String normalizedKeyword = keyword.toLowerCase();
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase().contains(normalizedKeyword))
+                .toList();
+    }
 }
