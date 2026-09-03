@@ -57,32 +57,32 @@ public class Orbit {
 
     private void execute(CommandType command, String input) throws OrbitException {
         switch (command) {
-        case LIST:
-            showList();
-            break;
-        case MARK:
-            updateStatus(input, true);
-            break;
-        case UNMARK:
-            updateStatus(input, false);
-            break;
-        case TODO:
-            addTodo(input);
-            break;
-        case DEADLINE:
-            addDeadline(input);
-            break;
-        case EVENT:
-            addEvent(input);
-            break;
-        case DELETE:
-            deleteTask(input);
-            break;
-        case FIND:
-            findTasks(input);
-            break;
-        default:
-            throw new OrbitException("I'm sorry, but I don't know what that means :-(");
+            case LIST:
+                showList();
+                break;
+            case MARK:
+                updateStatus(input, true);
+                break;
+            case UNMARK:
+                updateStatus(input, false);
+                break;
+            case TODO:
+                addTodo(input);
+                break;
+            case DEADLINE:
+                addDeadline(input);
+                break;
+            case EVENT:
+                addEvent(input);
+                break;
+            case DELETE:
+                deleteTask(input);
+                break;
+            case FIND:
+                findTasks(input);
+                break;
+            default:
+                throw new OrbitException("I'm sorry, but I don't know what that means :-(");
         }
     }
 
