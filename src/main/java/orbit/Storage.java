@@ -60,17 +60,17 @@ public class Storage {
         }
         Task task;
         switch (fields[0]) {
-        case "T":
-            task = new Todo(fields[2]);
-            break;
-        case "D":
-            task = new Deadline(fields[2], fields[3]);
-            break;
-        case "E":
-            task = new Event(fields[2], fields[3], fields[4]);
-            break;
-        default:
-            throw new OrbitException("Unknown saved task type: " + fields[0]);
+            case "T":
+                task = new Todo(fields[2]);
+                break;
+            case "D":
+                task = new Deadline(fields[2], fields[3]);
+                break;
+            case "E":
+                task = new Event(fields[2], fields[3], fields[4]);
+                break;
+            default:
+                throw new OrbitException("Unknown saved task type: " + fields[0]);
         }
         if (fields[1].equals("1")) {
             task.markAsDone();
