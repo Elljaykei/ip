@@ -41,7 +41,7 @@ public class MainWindow {
         if (input.isEmpty()) {
             return;
         }
-        dialogContainer.getChildren().addAll(
+        addDialogs(
                 DialogBox.getUserDialog(input),
                 DialogBox.getOrbitDialog(orbit.getResponse(input)));
         userInput.clear();
@@ -51,5 +51,14 @@ public class MainWindow {
             pause.setOnFinished(event -> Platform.exit());
             pause.play();
         }
+    }
+
+    /**
+     * Appends any number of dialogs to the conversation in the supplied order.
+     *
+     * @param dialogs Dialogs to append.
+     */
+    private void addDialogs(DialogBox... dialogs) {
+        dialogContainer.getChildren().addAll(dialogs);
     }
 }
