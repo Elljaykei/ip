@@ -164,7 +164,10 @@ public class Orbit {
         return addTask(new Event(description, from, to));
     }
 
-    private String addTask(Task task) {
+    private String addTask(Task task) throws OrbitException {
+        if (tasks.containsDuplicate(task)) {
+            throw new OrbitException("This task already exists. Use list to find it, or unmark it to reopen it.");
+        }
         tasks.add(task);
         saveTasks();
         return "Got it. I've added this task:\n   " + task

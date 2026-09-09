@@ -36,6 +36,18 @@ public abstract class Task {
     }
 
     /**
+     * Checks whether another task describes the same work, ignoring completion status.
+     * Subclasses also compare their dates or times.
+     *
+     * @param other Task to compare.
+     * @return Whether type and description match, ignoring case and surrounding whitespace.
+     */
+    public boolean isDuplicateOf(Task other) {
+        return other != null && getType() == other.getType()
+                && description.strip().equalsIgnoreCase(other.description.strip());
+    }
+
+    /**
      * Converts this task to its persistent text representation.
      *
      * @return Serialized task fields.

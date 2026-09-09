@@ -29,6 +29,16 @@ public class TaskList {
     }
 
     /**
+     * Checks for an existing task with matching details, including completed tasks.
+     *
+     * @param task Proposed task.
+     * @return Whether a duplicate is already in the list.
+     */
+    public boolean containsDuplicate(Task task) {
+        return tasks.stream().anyMatch(existing -> existing.isDuplicateOf(task));
+    }
+
+    /**
      * Returns the task at an index.
      *
      * @param index Zero-based task index.
