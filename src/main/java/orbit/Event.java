@@ -26,6 +26,13 @@ public class Event extends Task {
     }
 
     @Override
+    public boolean isDuplicateOf(Task other) {
+        return other instanceof Event event && super.isDuplicateOf(other)
+                && from.strip().equalsIgnoreCase(event.from.strip())
+                && to.strip().equalsIgnoreCase(event.to.strip());
+    }
+
+    @Override
     public String toDataString() {
         return super.toDataString() + " | " + from + " | " + to;
     }

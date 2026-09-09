@@ -27,6 +27,11 @@ public class Deadline extends Task {
     }
 
     @Override
+    public boolean isDuplicateOf(Task other) {
+        return other instanceof Deadline deadline && super.isDuplicateOf(other) && by.equals(deadline.by);
+    }
+
+    @Override
     public String toDataString() {
         return super.toDataString() + " | " + by;
     }
