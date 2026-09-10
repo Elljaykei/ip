@@ -99,11 +99,7 @@ public class Orbit {
     }
 
     private String getTaskListMessage() {
-        StringBuilder message = new StringBuilder("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            message.append("\n ").append(i + 1).append('.').append(tasks.get(i));
-        }
-        return message.toString();
+        return Ui.formatTaskList("Here are the tasks in your list:", tasks.asList());
     }
 
     private String updateStatus(String input, boolean isDone) throws OrbitException {
@@ -180,11 +176,7 @@ public class Orbit {
     private String findTasks(String input) throws OrbitException {
         String keyword = extractDescription(input, "find");
         List<Task> matches = tasks.find(keyword);
-        StringBuilder message = new StringBuilder("Here are the matching tasks in your list:");
-        for (int i = 0; i < matches.size(); i++) {
-            message.append("\n ").append(i + 1).append('.').append(matches.get(i));
-        }
-        return message.toString();
+        return Ui.formatTaskList("Here are the matching tasks in your list:", matches);
     }
 
     private void saveTasks() {

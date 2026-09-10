@@ -1,6 +1,9 @@
 package orbit;
 
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Handles console input and output for Orbit.
@@ -27,6 +30,19 @@ public class Ui {
     /** @return Next trimmed user command. */
     public String readCommand() {
         return scanner.nextLine().trim();
+    }
+
+    /**
+     * Formats ordered tasks for a CLI or GUI response without modifying the list.
+     *
+     * @param heading Text before the numbered tasks.
+     * @param tasks Tasks to display, in display order.
+     * @return Heading followed by one-based task lines, or only the heading when empty.
+     */
+    public static String formatTaskList(String heading, List<Task> tasks) {
+        return IntStream.range(0, tasks.size())
+                .mapToObj(index -> "\n " + (index + 1) + "." + tasks.get(index))
+                .collect(Collectors.joining("", heading, ""));
     }
 
     /** Displays Orbit's greeting. */
