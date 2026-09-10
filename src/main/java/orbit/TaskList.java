@@ -20,11 +20,14 @@ public class TaskList {
      * @param tasks Initial tasks.
      */
     public TaskList(List<Task> tasks) {
+        assert tasks != null : "Initial task list must exist";
+        assert tasks.stream().noneMatch(task -> task == null) : "Initial tasks must not contain null";
         this.tasks = new ArrayList<>(tasks);
     }
 
     /** @param task Task to append. */
     public void add(Task task) {
+        assert task != null : "Only constructed tasks may be added";
         tasks.add(task);
     }
 
@@ -45,6 +48,7 @@ public class TaskList {
      * @return Task at the index.
      */
     public Task get(int index) {
+        assert index >= 0 && index < tasks.size() : "Task index must be validated before lookup";
         return tasks.get(index);
     }
 
@@ -55,6 +59,7 @@ public class TaskList {
      * @return Removed task.
      */
     public Task remove(int index) {
+        assert index >= 0 && index < tasks.size() : "Task index must be validated before removal";
         return tasks.remove(index);
     }
 
