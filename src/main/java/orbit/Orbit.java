@@ -10,6 +10,9 @@ import java.util.Scanner;
  */
 public class Orbit {
     private static final String DATA_FILE_PATH = "data/orbit.txt";
+    private static final String DEADLINE_SEPARATOR = " /by ";
+    private static final String EVENT_START_SEPARATOR = " /from ";
+    private static final String EVENT_END_SEPARATOR = " /to ";
 
     private final TaskList tasks;
     private final Storage storage;
@@ -44,10 +47,10 @@ public class Orbit {
      * Starts the chatbot and processes commands until the user enters {@code bye}.
      */
     public void run() {
-        showWelcome();
+        ui.showWelcome();
         while (ui.hasNextCommand()) {
             String input = ui.readCommand();
-            showMessage(getResponse(input));
+            ui.showMessage(getResponse(input));
             if (parser.parse(input) == CommandType.BYE) {
                 return;
             }
@@ -95,14 +98,6 @@ public class Orbit {
         }
     }
 
-    private void showWelcome() {
-        ui.showWelcome();
-    }
-
-    private void showMessage(String message) {
-        ui.showMessage(message);
-    }
-
     private String getTaskListMessage() {
         return Ui.formatTaskList("Here are the tasks in your list:", tasks.asList());
     }
@@ -113,13 +108,13 @@ public class Orbit {
         Task task = tasks.get(index);
         if (isDone) {
             task.markAsDone();
-            saveTasks();
-            return "Nice! I've marked this task as done:\n   " + task;
         } else {
             task.markAsNotDone();
-            saveTasks();
-            return "OK, I've marked this task as not done yet:\n   " + task;
         }
+        saveTasks();
+        String message = isDone ? "Nice! I've marked this task as done:"
+                : "OK, I've marked this task as not done yet:";
+        return message + "\n   " + task;
     }
 
     private String addTodo(String input) throws OrbitException {
@@ -129,12 +124,12 @@ public class Orbit {
 
     private String addDeadline(String input) throws OrbitException {
         String details = extractDescription(input, "deadline");
-        int separator = details.indexOf(" /by ");
+        int separator = details.indexOf(DEADLINE_SEPARATOR);
         if (separator < 0) {
             throw new OrbitException("A deadline needs a description and '/by' date or time.");
         }
         String description = details.substring(0, separator).trim();
-        String by = details.substring(separator + 5).trim();
+        String by = details.substring(separator + DEADLINE_SEPARATOR.length()).trim();
         requireNonEmpty(description, "The description of a deadline cannot be empty.");
         requireNonEmpty(by, "The '/by' date or time of a deadline cannot be empty.");
         try {
@@ -146,14 +141,14 @@ public class Orbit {
 
     private String addEvent(String input) throws OrbitException {
         String details = extractDescription(input, "event");
-        int fromSeparator = details.indexOf(" /from ");
-        int toSeparator = details.indexOf(" /to ");
+        int fromSeparator = details.indexOf(EVENT_START_SEPARATOR);
+        int toSeparator = details.indexOf(EVENT_END_SEPARATOR);
         if (fromSeparator < 0 || toSeparator < 0 || toSeparator < fromSeparator) {
             throw new OrbitException("An event needs a description, '/from' time, and '/to' time.");
         }
         String description = details.substring(0, fromSeparator).trim();
-        String from = details.substring(fromSeparator + 7, toSeparator).trim();
-        String to = details.substring(toSeparator + 5).trim();
+        String from = details.substring(fromSeparator + EVENT_START_SEPARATOR.length(), toSeparator).trim();
+        String to = details.substring(toSeparator + EVENT_END_SEPARATOR.length()).trim();
         requireNonEmpty(description, "The description of an event cannot be empty.");
         requireNonEmpty(from, "The '/from' time of an event cannot be empty.");
         requireNonEmpty(to, "The '/to' time of an event cannot be empty.");
@@ -188,7 +183,7 @@ public class Orbit {
         try {
             storage.save(tasks.asList());
         } catch (IOException e) {
-            showMessage("OOPS!!! Could not save tasks: " + e.getMessage());
+            ui.showMessage("OOPS!!! Could not save tasks: " + e.getMessage());
         }
     }
 
