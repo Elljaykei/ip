@@ -22,7 +22,7 @@ public enum CommandType {
      * @return Matching command type, or {@link #UNKNOWN}.
      */
     public static CommandType from(String input) {
-        String commandWord = input.split("\\s+", 2)[0];
+        String commandWord = input.strip().split("\\s+", 2)[0];
         for (CommandType command : values()) {
             if (command.name().equalsIgnoreCase(commandWord)) {
                 return command;

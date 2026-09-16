@@ -18,6 +18,8 @@ public class Orbit {
     private final Storage storage;
     private final Ui ui;
     private final Parser parser;
+    private String storageWarning = "";
+    private boolean storageAvailable = true;
 
     /**
      * Creates an Orbit chatbot that reads commands from the supplied scanner.
@@ -25,15 +27,27 @@ public class Orbit {
      * @param scanner Source of user commands.
      */
     public Orbit(Scanner scanner) {
+        this(scanner, DATA_FILE_PATH);
+    }
+
+    /**
+     * Creates a chatbot using a chosen data location.
+     *
+     * @param scanner Source of commands.
+     * @param filePath Task data location.
+     */
+    public Orbit(Scanner scanner, String filePath) {
         this.ui = new Ui(scanner);
         this.parser = new Parser();
-        this.storage = new Storage(DATA_FILE_PATH);
+        this.storage = new Storage(filePath);
         List<Task> loadedTasks;
         try {
             loadedTasks = storage.load();
         } catch (IOException | OrbitException e) {
             loadedTasks = List.of();
-            System.out.println("OOPS!!! Could not load saved tasks: " + e.getMessage());
+            storageAvailable = false;
+            storageWarning = "OOPS!!! Could not load saved tasks: " + e.getMessage()
+                    + "\nSaving is disabled to protect your file. Repair it and restart Orbit.";
         }
         this.tasks = new TaskList(loadedTasks);
     }
@@ -48,10 +62,13 @@ public class Orbit {
      */
     public void run() {
         ui.showWelcome();
+        if (!storageWarning.isEmpty()) {
+            ui.showMessage(storageWarning);
+        }
         while (ui.hasNextCommand()) {
             String input = ui.readCommand();
             ui.showMessage(getResponse(input));
-            if (parser.parse(input) == CommandType.BYE) {
+            if (input.strip().equalsIgnoreCase("bye")) {
                 return;
             }
         }
@@ -65,11 +82,21 @@ public class Orbit {
      */
     public String getResponse(String input) {
         try {
+            input = input == null ? "" : input.strip();
+            if (input.contains("|") || input.contains("\n") || input.contains("\r")) {
+                throw new OrbitException("Commands cannot contain pipes or line breaks.");
+            }
+            input = input.replaceAll("\\s+(/by|/from|/to)(?=\\s|$)\\s*", " $1 ");
             CommandType command = parser.parse(input);
+            if ((command == CommandType.LIST || command == CommandType.BYE)
+                    && input.split("\\s+", 2).length > 1) {
+                throw new OrbitException("This command does not take arguments.");
+            }
             if (command == CommandType.BYE) {
                 return "Bye. Hope to see you again soon!";
             }
-            return execute(command, input);
+            String response = execute(command, input);
+            return storageWarning.isEmpty() ? response : response + "\n" + storageWarning;
         } catch (OrbitException e) {
             return "OOPS!!! " + e.getMessage();
         }
@@ -125,7 +152,7 @@ public class Orbit {
     private String addDeadline(String input) throws OrbitException {
         String details = extractDescription(input, "deadline");
         int separator = details.indexOf(DEADLINE_SEPARATOR);
-        if (separator < 0) {
+        if (separator < 0 || separator != details.lastIndexOf(DEADLINE_SEPARATOR)) {
             throw new OrbitException("A deadline needs a description and '/by' date or time.");
         }
         String description = details.substring(0, separator).trim();
@@ -143,7 +170,9 @@ public class Orbit {
         String details = extractDescription(input, "event");
         int fromSeparator = details.indexOf(EVENT_START_SEPARATOR);
         int toSeparator = details.indexOf(EVENT_END_SEPARATOR);
-        if (fromSeparator < 0 || toSeparator < 0 || toSeparator < fromSeparator) {
+        if (fromSeparator < 0 || toSeparator < 0 || toSeparator < fromSeparator
+                || fromSeparator != details.lastIndexOf(EVENT_START_SEPARATOR)
+                || toSeparator != details.lastIndexOf(EVENT_END_SEPARATOR)) {
             throw new OrbitException("An event needs a description, '/from' time, and '/to' time.");
         }
         String description = details.substring(0, fromSeparator).trim();
@@ -179,11 +208,17 @@ public class Orbit {
         return Ui.formatTaskList("Here are the matching tasks in your list:", matches);
     }
 
+    /** Keeps unsaved changes in memory and reports persistence failures to both interfaces. */
     private void saveTasks() {
+        if (!storageAvailable) {
+            return;
+        }
+        storageWarning = "";
         try {
             storage.save(tasks.asList());
         } catch (IOException e) {
-            ui.showMessage("OOPS!!! Could not save tasks: " + e.getMessage());
+            storageWarning = "OOPS!!! Could not save tasks: " + e.getMessage()
+                    + "\nChanges are in memory only. Keep Orbit open and restore access to the data folder.";
         }
     }
 
@@ -213,6 +248,11 @@ public class Orbit {
         if (text.isEmpty()) {
             throw new OrbitException(errorMessage);
         }
+    }
+
+    /** @return Storage warning, or an empty string when storage is healthy. */
+    public String getStorageWarning() {
+        return storageWarning;
     }
 
     /**
