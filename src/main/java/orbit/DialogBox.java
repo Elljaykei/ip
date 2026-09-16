@@ -13,7 +13,7 @@ public class DialogBox extends HBox {
     private DialogBox(String text) {
         message.setText(text);
         message.setWrapText(true);
-        message.setMaxWidth(340);
+        message.maxWidthProperty().bind(widthProperty().multiply(0.9));
         getChildren().add(message);
     }
 
@@ -30,6 +30,9 @@ public class DialogBox extends HBox {
         DialogBox dialog = new DialogBox(text);
         dialog.setAlignment(Pos.TOP_LEFT);
         dialog.message.getStyleClass().add("orbit-message");
+        if (text.contains("OOPS!!!")) {
+            dialog.message.getStyleClass().add("error-message");
+        }
         return dialog;
     }
 }
