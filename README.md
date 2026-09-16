@@ -1,18 +1,28 @@
-# Orbit
+﻿# Orbit
 
-Orbit is a command-line personal assistant that helps you keep track of todos, deadlines, and events.
+Orbit is a Java 25 personal task assistant with a JavaFX chat interface and a CLI.
+Read the [User Guide](docs/README.md) for commands and data recovery guidance.
 
-## Setting up in Intellij
+## Develop in VS Code
 
-Prerequisites: JDK 25, update Intellij to the most recent version.
+Open this folder with Java support installed and select JDK 25. Confirm the
+terminal uses Java 25 with `java -version`.
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 25** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Orbit.java` file, right-click it, and choose `Run Orbit.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, Orbit will greet you and wait for a command.
+```powershell
+./gradlew.bat check
+./gradlew.bat run
+./gradlew.bat clean shadowJar
+```
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+On macOS/Linux use `./gradlew` instead. The fat JAR is `build/libs/orbit.jar`:
+
+```text
+java -jar build/libs/orbit.jar
+```
+
+For the CLI, run `java -cp build/libs/orbit.jar orbit.Orbit`.
+
+The build packages JavaFX natives for Windows, macOS, and Linux. Testing on other
+operating systems still requires a test drive on those systems.
+
+Based on the SE-EDU Duke starter and JavaFX tutorial; see the User Guide credits.
