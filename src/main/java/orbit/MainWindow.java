@@ -31,7 +31,10 @@ public class MainWindow {
     public void setOrbit(Orbit orbit) {
         this.orbit = orbit;
         dialogContainer.getChildren().add(DialogBox.getOrbitDialog(
-                "Hello! I'm Orbit. What can I do for you?"));
+                "Hello! I'm Orbit. Keep your tasks in view.\nTry todo read book, list, or find book."));
+        if (!orbit.getStorageWarning().isEmpty()) {
+            dialogContainer.getChildren().add(DialogBox.getOrbitDialog(orbit.getStorageWarning()));
+        }
     }
 
     /** Sends the current input to Orbit and appends both messages to the chat. */
@@ -46,7 +49,7 @@ public class MainWindow {
                 DialogBox.getOrbitDialog(orbit.getResponse(input)));
         userInput.clear();
 
-        if (CommandType.from(input) == CommandType.BYE) {
+        if (input.equalsIgnoreCase("bye")) {
             PauseTransition pause = new PauseTransition(Duration.seconds(1));
             pause.setOnFinished(event -> Platform.exit());
             pause.play();
