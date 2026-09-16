@@ -3,6 +3,8 @@ package orbit;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,13 +52,42 @@ public class Storage {
         if (parent != null) {
             Files.createDirectories(parent);
         }
-        Files.write(filePath, tasks.stream().map(Task::toDataString).toList());
+        Path temporary = Files.createTempFile(filePath.toAbsolutePath().getParent(), "orbit-", ".tmp");
+        try {
+            Files.write(temporary, tasks.stream().map(Task::toDataString).toList());
+            Files.move(temporary, filePath, StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            Files.deleteIfExists(temporary);
+        }
     }
 
+    /** Validates saved records and translates invalid dates into a recoverable load error. */
     private Task parseTask(String line) throws OrbitException {
+        try {
+            return parseRecord(line);
+        } catch (DateTimeParseException e) {
+            throw new OrbitException("Invalid date in saved task: " + line);
+        }
+    }
+
+    private Task parseRecord(String line) throws OrbitException {
         String[] fields = line.split(" \\| ", -1);
         if (fields.length < 3) {
             throw new OrbitException("Invalid saved task: " + line);
+        }
+        int expectedFields = switch (fields[0]) {
+            case "T" -> 3;
+            case "D" -> 4;
+            case "E" -> 5;
+            default -> 0;
+        };
+        if (fields.length != expectedFields || !(fields[1].equals("0") || fields[1].equals("1"))) {
+            throw new OrbitException("Invalid saved task: " + line);
+        }
+        for (int i = 2; i < fields.length; i++) {
+            if (fields[i].isBlank()) {
+                throw new OrbitException("Empty field in saved task: " + line);
+            }
         }
         Task task;
         switch (fields[0]) {
